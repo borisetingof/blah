@@ -9,10 +9,12 @@ Parameters:
     Description: AWS CodeStar projectID used to associate new resources to team members
 
 Resources:
+  
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
         StageName: prod
+        RoleArn: !GetAtt StateMachineExecutionRole.Arn
         DefinitionBody:
             swagger: 2.0
             info:
@@ -27,12 +29,39 @@ Resources:
                     uri:
                       Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations
                   responses: {}
+
+  StateMachineExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                !Join [ ".", [ "states", !Ref "AWS::Region", "amazonaws.com"] ]
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        -
+          PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: "lambda:InvokeFunction"
+                Resource: "*"
+
   MyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
       Runtime: nodejs6.10
       CodeUri: src/
+      Policies: AWSLambdaFullAccess
       Events:
         GetApi:
           Type: Api
