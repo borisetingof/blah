@@ -1,6 +1,13 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
-Description: Simple API Endpoint configured using Swagger specified inline and backed by a Lambda function
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+- AWS::Serverless-2016-10-31
+- AWS::CodeStar
+
+Parameters:
+  ProjectId:
+    Type: String
+    Description: AWS CodeStar projectID used to associate new resources to team members
+
 Resources:
   MyApi:
     Type: AWS::Serverless::Api
@@ -20,10 +27,6 @@ Resources:
                     uri:
                       Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations
                   responses: {}
-
-
-
-            
   MyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -38,9 +41,3 @@ Resources:
             Method: GET
             RestApiId: 
                 Ref: MyApi
-
-Outputs:
-
-    ApiURL:
-      Description: "API endpoint URL for Prod environment"
-      Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/prod/get"
