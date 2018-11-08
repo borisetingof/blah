@@ -29,35 +29,11 @@ Resources:
                       Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations
                   responses: {}
 
-  StateMachineExecutionRole:
-    Type: "AWS::IAM::Role"
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          -
-            Effect: "Allow"
-            Principal:
-              Service:
-                !Join [ ".", [ "states", !Ref "AWS::Region", "amazonaws.com"] ]
-            Action:
-              - "sts:AssumeRole"
-      Path: "/"
-      Policies:
-        -
-          PolicyName: "root"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Effect: "Allow"
-                Action: "lambda:InvokeFunction"
-                Resource: "*"
+
 
   MyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Role: !GetAtt StateMachineExecutionRole.Arn
       Handler: index.handler
       Runtime: nodejs6.10
       CodeUri: src/
