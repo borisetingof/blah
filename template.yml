@@ -14,7 +14,6 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
         StageName: prod
-        # RoleArn: !GetAtt StateMachineExecutionRole.Arn
         DefinitionBody:
             swagger: 2.0
             info:
@@ -58,6 +57,7 @@ Resources:
   MyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
+      RoleArn: !GetAtt StateMachineExecutionRole.Arn
       Handler: index.handler
       Runtime: nodejs6.10
       CodeUri: src/
